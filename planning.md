@@ -124,6 +124,34 @@ For each tool, describe the specific failure mode you're handling and what the a
      sketch are all fine. You'll share this diagram with an AI tool when asking it to implement
      the planning loop and each individual tool. -->
 
+User query
+    │
+    ▼
+Planning Loop ────────────────────────────────────────────────────────┐
+    │                                                                 │
+    ├──► search_listings(description, size, max_price)                │
+    │       │                                                         │
+    │       ├──► results=[]                                           │
+    │       │       │                                                 │
+    │       │       └──► [ERROR] "No listings found..." ──► return    │
+    │       │                                                         │
+    │       └──► results=[item, ...]                                  │
+    │               │                                                 │
+    │               ▼                                                 │
+    │       Session: selected_item = results[0]                       │
+    │               │                                                 │
+    ├──► suggest_outfit(selected_item, wardrobe)                      │
+    │       │                                                         │
+    │       Session: outfit_suggestion = "..."                        │
+    │               │                                                 │
+    └──► create_fit_card(outfit_suggestion, selected_item)            │
+            │                                                         │
+            Session: fit_card = "..."                                 │
+            │                                                         │
+            ▼                                                         └─► error path returns here
+      Return session
+
+
 ---
 
 ## AI Tool Plan
@@ -138,6 +166,10 @@ For each tool, describe the specific failure mode you're handling and what the a
      "I'll give Claude my Tool 1 spec (inputs, return value, failure mode) and ask it to implement
      search_listings() using load_listings() from the data loader — then test it against 3 queries
      before trusting it" is a plan. -->
+
+I'll give Claude my Tool 1, 2 and 3 spec (inputs, return value, failure mode) and ask it to implement
+search_listings() using load_listings() from the data loader — then test it against 3 queries
+before trusting it. I will also ask it to implement suggest_outfit() and create_fit_card(). I will modify the spec based on testing. 
 
 **Milestone 3 — Individual tool implementations:**
 
