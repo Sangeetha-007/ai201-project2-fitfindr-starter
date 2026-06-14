@@ -124,32 +124,37 @@ For each tool, describe the specific failure mode you're handling and what the a
      sketch are all fine. You'll share this diagram with an AI tool when asking it to implement
      the planning loop and each individual tool. -->
 
-User query
-    │
-    ▼
-Planning Loop ────────────────────────────────────────────────────────┐
-    │                                                                 │
-    ├──► search_listings(description, size, max_price)                │
-    │       │                                                         │
-    │       ├──► results=[]                                           │
-    │       │       │                                                 │
-    │       │       └──► [ERROR] "No listings found..." ──► return    │
-    │       │                                                         │
-    │       └──► results=[item, ...]                                  │
-    │               │                                                 │
-    │               ▼                                                 │
-    │       Session: selected_item = results[0]                       │
-    │               │                                                 │
-    ├──► suggest_outfit(selected_item, wardrobe)                      │
-    │       │                                                         │
-    │       Session: outfit_suggestion = "..."                        │
-    │               │                                                 │
-    └──► create_fit_card(outfit_suggestion, selected_item)            │
-            │                                                         │
-            Session: fit_card = "..."                                 │
-            │                                                         │
-            ▼                                                         └─► error path returns here
-      Return session
+```mermaid
+graph TD
+    UserQuery[User query] --> PlanningLoop
+
+    subgraph PlanningLoop [Planning Loop]
+        direction TB
+        Search[search_listings<br>description, size, max_price]
+        Error{"results = [ ]"}
+        ErrorMsg["[ERROR] 'No listings found...' -> return"]
+        Success["results = [item, ...]"]
+        
+        Session1["Session: selected_item = results[0]"]
+        Suggest["suggest_outfit(selected_item, wardrobe)"]
+        Session2["Session: outfit_suggestion = '...'"]
+        CreateCard["create_fit_card(outfit_suggestion, selected_item)"]
+        Session3["Session: fit_card = '...'"]
+        Return["Return session"]
+
+        Search --> Error
+        Error --> ErrorMsg
+        Search --> Success
+        Success --> Session1
+        Session1 --> Suggest
+        Suggest --> Session2
+        Session2 --> CreateCard
+        CreateCard --> Session3
+        Session3 --> Return
+    end
+
+    ErrorMsg -->|error path returns here| PlanningLoop
+```
 
 
 ---
