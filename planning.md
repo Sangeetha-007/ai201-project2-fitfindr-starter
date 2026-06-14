@@ -12,40 +12,50 @@
 List every tool your agent will use. For each tool, fill in all four fields.
 You must have at least 3 tools. The three required tools are listed — add any additional tools below them.
 
+FitFindr is an application which will search the listing for used clothes and give top matches, suggest outfits and create a fit card. 
+
 ### Tool 1: search_listings
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
+Searches the mock listings dataset and returns matching items. Must handle the case where no matches are found.
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
-- `description` (str): ...
-- `size` (str): ...
-- `max_price` (float): ...
+- `description` (str): Description of the clothing piece
+- `size` (str): Size of the clothing piece
+- `max_price` (float): Maximum price of the clothing piece
+
+search_listings("vintage graphic tee", size="M", max_price=30.0)
 
 **What it returns:**
 <!-- Describe the return value — what fields does a result contain? -->
+It returns 3 matching listings sorted by relevance. FitFindr picks the top result. 
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if no listings match? -->
-
+If no listings match it should print out "I am sorry, your style requirements is beyond our reach! Please try a new search."
 ---
 
 ### Tool 2: suggest_outfit
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
+Given a specific item and the user's current wardrobe, suggests one or more complete outfit combinations. Must handle an empty or minimal wardrobe.
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
-- `new_item` (dict): ...
+- `new_item` (dict): 
 - `wardrobe` (dict): ...
-
+suggest_outfit(new_item=<band tee>, wardrobe=<user's wardrobe>)
 **What it returns:**
 <!-- Describe the return value -->
 
+It returns a statement, based on the results, for example: "Pair this with your wide-leg jeans and platform Docs for a classic 90s grunge look. Roll the sleeves once and tuck the front corner slightly for shape."
+
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the wardrobe is empty or no outfit can be suggested? -->
+If it fails it should print out a message like: "Your style seems to be so good as it is! We can't suggest an outfit at the moment, please try again later"!
 
 ---
 
@@ -53,16 +63,21 @@ You must have at least 3 tools. The three required tools are listed — add any 
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
+Generates a short, shareable description of a complete outfit — the kind of thing someone would caption an Instagram post with. Must produce something different each time for different inputs.
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
-- `outfit` (...): ...
+- `outfit` (str): ...
+- `new_item` (str):
+
+create_fit_card(outfit=<suggestion>, new_item=<band tee>)
 
 **What it returns:**
 <!-- Describe the return value -->
-
+It returns something that looks like could caption an Instagram post. For example, "thrifted this faded band tee off depop for $22 and honestly it was made for my wide-legs 🖤 full look in my stories"
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the outfit data is incomplete? -->
+If the outfit data is incomplete or the tool fails to generate a caption, the agent should return a generic fallback message such as "Outfit details unavailable — check back later!" and log the error for debugging. The agent should not crash or leave the user with an empty response.
 
 ---
 
