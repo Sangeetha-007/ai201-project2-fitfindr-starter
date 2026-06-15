@@ -107,9 +107,9 @@ For each tool, describe the specific failure mode you're handling and what the a
 
 | Tool | Failure mode | Agent response |
 |------|-------------|----------------|
-| search_listings | No results match the query | |
-| suggest_outfit | Wardrobe is empty | |
-| create_fit_card | Outfit input is missing or incomplete | |
+| search_listings | No results match the query | "I am sorry, your style requirements is beyond our reach! Please try a new search." |
+| suggest_outfit | Wardrobe is empty | "Your outfit seems to be so good as it is! We can't suggest an outfit at the moment, please try again later"! |
+| create_fit_card | Outfit input is missing or incomplete | "Outfit details unavailable — check back later!" |
 
 ---
 
@@ -189,13 +189,13 @@ Write out what a full user interaction looks like from start to finish — tool 
 **Example user query:** "I'm looking for a vintage graphic tee under $30. I mostly wear baggy jeans and chunky sneakers. What's out there and how would I style it?"
 
 **Step 1:**
-<!-- What does the agent do first? Which tool is called? With what input? -->
+The agent calls `search_listings(description="vintage graphic tee", size="M", max_price=30.0)`. It searches the mock listings dataset and returns the top 3 matching items sorted by relevance. The agent selects the top result — e.g., a faded Nirvana tee, size M, $22 — and stores it in session state as `selected_item`.
 
 **Step 2:**
-<!-- What happens next? What was returned from step 1? What tool is called now? -->
+The agent calls `suggest_outfit(new_item=selected_item, wardrobe={"bottoms": ["baggy jeans"], "shoes": ["chunky sneakers"]})`. Using the new item and the user's described wardrobe, it returns a styled suggestion: "Pair this with your baggy jeans and chunky sneakers for a laid-back 90s look. Leave it untucked and stack a few bracelets to finish it off." The suggestion is stored in session state as `outfit_suggestion`.
 
 **Step 3:**
-<!-- Continue until the full interaction is complete -->
+The agent calls `create_fit_card(outfit=outfit_suggestion, new_item=selected_item)`. It generates a short, Instagram-style caption: "thrifted this faded nirvana tee for $22 and it was made for my baggies 🤘 full fit in my stories". The result is stored as `fit_card`.
 
 **Final output to user:**
-<!-- What does the user actually see at the end? -->
+The user sees the top matching listing (item name, price, size), the outfit suggestion with styling tips, and the shareable fit card caption — presented together as a complete FitFindr response.
