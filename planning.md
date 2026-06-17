@@ -91,6 +91,7 @@ If the outfit data is incomplete or the tool fails to generate a caption, the ag
 
 **How does your agent decide which tool to call next?**
 <!-- Describe the logic your planning loop uses. What does it look at? What conditions change its behavior? How does it know when it's done? -->
+The agent runs tools in a fixed sequence: `search_listings` → `suggest_outfit` → `create_fit_card`. After calling `search_listings`, it checks whether the result list is empty — if so, it sets `session["error"]` and returns immediately, skipping the remaining two tools. This is the only conditional branch. If results exist, it always proceeds to `suggest_outfit` with the top result, then to `create_fit_card` with the outfit suggestion. The loop knows it is done when `session["fit_card"]` is populated and the session is returned.
 
 ---
 
@@ -98,6 +99,7 @@ If the outfit data is incomplete or the tool fails to generate a caption, the ag
 
 **How does information from one tool get passed to the next?**
 <!-- Describe how your agent stores and accesses state within a session. What data is tracked? How is it passed between tool calls? -->
+All state lives in a single `session` dict created by `_new_session()` at the start of each `run_agent()` call. After each tool runs, its output is written into the session: `search_listings` → `session["search_results"]` and `session["selected_item"]`; `suggest_outfit` → `session["outfit_suggestion"]`; `create_fit_card` → `session["fit_card"]`. Tools do not read from the session themselves — the planning loop extracts the relevant fields and passes them as explicit arguments (e.g. `suggest_outfit(session["selected_item"], session["wardrobe"])`). This keeps each tool independently testable and the data flow easy to trace.
 
 ---
 
